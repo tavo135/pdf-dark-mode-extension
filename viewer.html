@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Dark Mode</title>
+  <link rel="stylesheet" href="viewer.css">
+  <style>
+    body.dark { background-color: #121212; color: white; }
+    #viewer canvas { display: block; margin: 0 auto; }
+    #darkModeIcon {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 50px; height: 50px; background-color: #333;
+      color: white; border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer; font-size: 24px; z-index: 1000;
+    }
+    #darkModeIcon:hover { background-color: #555; transition: 0.3s; }
+  </style>
+</head>
+<body>
+  <h2>Visor PDF Dark Mode</h2>
+
+  <div id="controls">
+    <button id="prevPage">⬅️ Página anterior</button>
+    <span>Página <span id="pageNum">1</span> de <span id="pageCount">?</span></span>
+    <button id="nextPage">➡️ Página siguiente</button>
+    <input type="file" id="filePicker" accept="application/pdf">
+  </div>
+
+  <div id="viewer"></div>
+
+  <!-- Icono flotante de modo oscuro -->
+  <div id="darkModeIcon">🌙</div>
+
+  <script type="module" src="viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "PDF Dark Mode",
+  "description": "Extensión que muestra PDFs con un modo oscuro personalizado",
+  "version": "1.2",
+  "manifest_version": 3,
+  "host_permissions": ["file:///*"],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["viewer.html", "viewer.js", "viewer.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
