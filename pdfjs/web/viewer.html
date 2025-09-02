@@ -24,16 +24,77 @@ See https://github.com/adobe-type-tools/cmap-resources
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!--#if GENERIC || CHROME-->
     <meta name="google" content="notranslate">
+<!--#endif-->
     <title>PDF.js viewer</title>
 
-<!-- This snippet is used in production (included from viewer.html) -->
-<link rel="resource" type="application/l10n" href="locale/locale.json">
-<script src="../build/pdf.mjs" type="module"></script>
+<!--#if MOZCENTRAL-->
+<!--#include viewer-snippet-firefox-extension.html-->
+<!--#elif CHROME-->
+<!--#include viewer-snippet-chrome-extension.html-->
+<!--#else-->
+<!--#include viewer-snippet.html-->
+<!--#endif-->
 
+<!--#if MOZCENTRAL-->
+<!--<link rel="stylesheet" href="resource://pdf.js/web/viewer.css">-->
+<!--<link rel="localization" href="toolkit/pdfviewer/viewer.ftl"/>-->
+<!--#else-->
     <link rel="stylesheet" href="viewer.css">
+<!--#endif-->
 
-  <script src="viewer.mjs" type="module"></script>
+<!--#if MOZCENTRAL-->
+<!--<script src="resource://pdf.js/web/viewer.mjs" type="module"></script>-->
+<!--#elif !MOZCENTRAL-->
+<!--<script src="viewer.mjs" type="module"></script>-->
+<!--#elif /* Development mode. */-->
+    <link rel="resource" type="application/l10n" href="locale/locale.json">
+
+    <script type="importmap">
+      {
+        "imports": {
+          "pdfjs/": "../src/",
+          "pdfjs-lib": "../src/pdf.js",
+          "pdfjs-web/": "./",
+
+          "fluent-bundle": "../node_modules/@fluent/bundle/esm/index.js",
+          "fluent-dom": "../node_modules/@fluent/dom/esm/index.js",
+          "cached-iterable": "../node_modules/cached-iterable/src/index.mjs",
+
+          "display-cmap_reader_factory": "../src/display/cmap_reader_factory.js",
+          "display-standard_fontdata_factory": "../src/display/standard_fontdata_factory.js",
+          "display-wasm_factory": "../src/display/wasm_factory.js",
+          "display-fetch_stream": "../src/display/fetch_stream.js",
+          "display-network": "../src/display/network.js",
+          "display-node_stream": "../src/display/stubs.js",
+          "display-node_utils": "../src/display/stubs.js",
+
+          "web-alt_text_manager": "./alt_text_manager.js",
+          "web-annotation_editor_params": "./annotation_editor_params.js",
+          "web-download_manager": "./download_manager.js",
+          "web-external_services": "./genericcom.js",
+          "web-new_alt_text_manager": "./new_alt_text_manager.js",
+          "web-null_l10n": "./genericl10n.js",
+          "web-pdf_attachment_viewer": "./pdf_attachment_viewer.js",
+          "web-pdf_cursor_tools": "./pdf_cursor_tools.js",
+          "web-pdf_document_properties": "./pdf_document_properties.js",
+          "web-pdf_find_bar": "./pdf_find_bar.js",
+          "web-pdf_layer_viewer": "./pdf_layer_viewer.js",
+          "web-pdf_outline_viewer": "./pdf_outline_viewer.js",
+          "web-pdf_presentation_mode": "./pdf_presentation_mode.js",
+          "web-pdf_sidebar": "./pdf_sidebar.js",
+          "web-pdf_thumbnail_viewer": "./pdf_thumbnail_viewer.js",
+          "web-preferences": "./genericcom.js",
+          "web-print_service": "./pdf_print_service.js",
+          "web-secondary_toolbar": "./secondary_toolbar.js",
+          "web-signature_manager": "./signature_manager.js",
+          "web-toolbar": "./toolbar.js"
+        }
+      }
+    </script>
+    <script src="viewer.js" type="module"></script>
+<!--#endif-->
   </head>
 
   <body tabindex="0">
@@ -184,6 +245,25 @@ See https://github.com/adobe-type-tools/cmap-resources
               </div>
               <div id="toolbarViewerRight" class="toolbarHorizontalGroup">
                 <div id="editorModeButtons" class="toolbarHorizontalGroup" role="radiogroup">
+                  <div id="editorComment" class="toolbarButtonWithContainer" hidden="true">
+                    <button id="editorCommentButton" class="toolbarButton" type="button" tabindex="0" disabled="disabled" role="radio" aria-expanded="false" aria-haspopup="true" aria-controls="editorCommentParamsToolbar" data-l10n-id="pdfjs-editor-comment-button">
+                      <span data-l10n-id="pdfjs-editor-comment-button-label"></span>
+                    </button>
+                    <div class="editorParamsToolbar sidebar hidden menu" id="editorCommentParamsToolbar">
+                      <div id="editorCommentsSidebar" class="menuContainer" role="landmark" aria-labelledby="editorCommentsSidebarHeader">
+                        <div id="editorCommentsSidebarHeader" role="heading" aria-level="2">
+                          <span class="commentCount">
+                            <span id="editorCommentsSidebarTitle" data-l10n-id="pdfjs-editor-comments-sidebar-title" data-l10n-args='{ "count": 0 }'></span>
+                            <span id="editorCommentsSidebarCount"></span>
+                          </span>
+                          <button id="editorCommentsSidebarCloseButton" type="button" tabindex="0" data-l10n-id="pdfjs-editor-comments-sidebar-close-button">
+                            <span data-l10n-id="pdfjs-editor-comments-sidebar-close-button-label"></span>
+                          </button>
+                        </div>
+                        <ul id="editorCommentsSidebarList"></ul>
+                      </div>
+                    </div>
+                  </div>
                   <div id="editorSignature" class="toolbarButtonWithContainer" hidden="true">
                     <button id="editorSignatureButton" class="toolbarButton" type="button" tabindex="0" disabled="disabled" role="radio" aria-expanded="false" aria-haspopup="true" aria-controls="editorSignatureParamsToolbar" data-l10n-id="pdfjs-editor-signature-button">
                       <span data-l10n-id="pdfjs-editor-signature-button-label"></span>
@@ -293,9 +373,11 @@ See https://github.com/adobe-type-tools/cmap-resources
                   </button>
                   <div id="secondaryToolbar" class="hidden doorHangerRight menu">
                     <div id="secondaryToolbarButtonContainer" class="menuContainer">
+<!--#if GENERIC-->
                       <button id="secondaryOpenFile" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-open-file-button">
                         <span data-l10n-id="pdfjs-open-file-button-label"></span>
                       </button>
+<!--#endif-->
 
                       <div class="visibleMediumView">
                         <button id="secondaryPrint" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-print-button">
@@ -306,9 +388,14 @@ See https://github.com/adobe-type-tools/cmap-resources
                           <span data-l10n-id="pdfjs-save-button-label"></span>
                         </button>
 
+<!--#if !GENERIC-->
+<!--            <div class="horizontalToolbarSeparator"></div>-->
+<!--#endif-->
                       </div>
 
+<!--#if GENERIC-->
                       <div class="horizontalToolbarSeparator"></div>
+<!--#endif-->
 
                       <button id="presentationMode" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-presentation-mode-button">
                         <span data-l10n-id="pdfjs-presentation-mode-button-label"></span>
@@ -734,6 +821,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         </div>
       </dialog>
 
+<!--#if !MOZCENTRAL-->
         <dialog id="printServiceDialog" style="min-width: 200px;">
           <div class="row">
             <span data-l10n-id="pdfjs-print-progress-message"></span>
@@ -746,6 +834,10 @@ See https://github.com/adobe-type-tools/cmap-resources
             <button id="printCancel" class="dialogButton" type="button"><span data-l10n-id="pdfjs-print-progress-close-button"></span></button>
           </div>
         </dialog>
+<!--#endif-->
+<!--#if CHROME-->
+<!--#include viewer-snippet-chrome-overlays.html-->
+<!--#endif-->
       </div>  <!-- dialogContainer -->
 
       <div id="editorUndoBar" class="messageBar" role="status" aria-labelledby="editorUndoBarMessage" tabindex="-1" hidden>
@@ -764,16 +856,5 @@ See https://github.com/adobe-type-tools/cmap-resources
 
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
- <!-- Controles de Modo de Visualización (sin onclick, sólo IDs) -->
-<div id="pdf-dark-controls" class="pdf-dark-controls">
-  <button id="btn-light" type="button">Claro</button>
-  <button id="btn-dark"  type="button">Oscuro</button>
-  <button id="btn-sepia" type="button">Sepia</button>
-  <button id="btn-invert" type="button">Invertir</button>
-</div>
-
-<!-- Cargamos un script externo para adherir listeners (evita CSP/inline) -->
-<script src="pdf-dark-controls.js"></script>
-
-</body>
+  </body>
 </html>

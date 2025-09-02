@@ -1,14 +1,41 @@
 {
   "name": "PDF Dark Mode",
-  "description": "Extensión que muestra PDFs con un modo oscuro personalizado",
-  "version": "1.2",
+  "description": "Visor PDF con modo oscuro y selección de texto",
+  "version": "1.4",
   "manifest_version": 3,
-  "host_permissions": ["file:///*"],
-
+  "host_permissions": [
+    "file:///*/*.pdf"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "web_accessible_resources": [
     {
-      "resources": ["viewer.html", "viewer.js", "viewer.css"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "viewer.html",
+        "viewer.js",
+        "viewer.css",
+        "pdfjs/build/pdf.mjs",
+        "pdfjs/build/pdf.worker.mjs",
+        "pdfjs/web/viewer.css",
+        "pdfjs/web/text_layer_builder.js"
+      ],
+      "matches": ["<all_urls>", "file://*/*"]
+
     }
-  ]
+  ],
+  "content_scripts": [
+    {
+"matches": [
+        "file://*/*.pdf",
+        "http://*/*.pdf",
+        "https://*/*.pdf"
+      ], 
+      "js": ["inject.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "Abrir visor PDF"
+  }
 }

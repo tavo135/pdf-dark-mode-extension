@@ -1,64 +1,105 @@
-:root {
-  --pdf-filter: none;
-  --img-filter: none;
-  --bg: #f5f5f5;
-  --topbar-bg: #ffffff;
-  --topbar-fg: #111111;
-  --border: #e0e0e0;
-}
-html.dark {
-  --pdf-filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(1.05);
-  --img-filter: invert(1) hue-rotate(180deg);
-  --bg: #0f1115;
-  --topbar-bg: #161a22;
-  --topbar-fg: #f0f3f7;
-  --border: #2a2f3a;
-}
-html.sepia {
-  --pdf-filter: sepia(0.25) brightness(0.95) contrast(0.98);
-  --img-filter: sepia(0.25);
-  --bg: #f7f1e3;
-  --topbar-bg: #f0e6d2;
-  --topbar-fg: #3b2f2f;
-  --border: #e2d6bd;
-}
-html, body { height: 100%; }
+/* Estilos principales */
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--topbar-fg);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f5;
+    transition: background 0.3s ease; /* Transición para el cambio de modo oscuro */
 }
-.topbar {
-  position: sticky;
-  top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  background: var(--topbar-bg);
-  color: var(--topbar-fg);
-  border-bottom: 1px solid var(--border);
-  z-index: 10;
+
+#toolbar {
+    background: #2c2c2c;
+    color: #ffffff;
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
-.brand { font-weight: 700; }
-.controls { display: flex; align-items: center; gap: 8px; }
-.controls button {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--topbar-fg);
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
+
+#toolbar button, #toolbar input {
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
-.controls button:hover { outline: 2px solid var(--border); }
-.toggle { display: inline-flex; align-items: center; gap: 6px; user-select: none; }
-#app { position: fixed; top: 48px; left: 0; right: 0; bottom: 0; }
-#pdf, #pdf-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  filter: var(--pdf-filter);
+
+#toolbar button:hover {
+    background: #444;
 }
-#pdf img, #pdf-frame img { filter: var(--img-filter); }
+
+/* Visor principal, tamaño y scroll */
+.viewerContainer {
+    position: relative;
+    width: 100vw;
+    height: calc(100vh - 60px); /* Asegura que se ajuste a la altura restante */
+    overflow-y: auto;
+    background: #f2f2f2;
+    transition: background 0.3s ease;
+}
+
+/* Modo oscuro para el fondo del visor */
+body.dark .viewerContainer {
+    background: #121212;
+}
+
+/* Modo oscuro para la imagen del PDF (canvas) */
+body.dark .page-container canvas {
+    /* Mejorado para preservar mejor los colores y la textura de las imágenes */
+    filter: invert(0.95) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+    transition: filter 0.5s ease;
+}
+
+/* Contenedor de cada página, con sombra */
+.page-container {
+    position: relative;
+    margin: 20px auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    background: white;
+    display: block;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Modo oscuro para el fondo de la página */
+body.dark .page-container {
+    background: #1e1e1e;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+}
+
+/* Posicionar el canvas y la capa de texto */
+.page-container canvas,
+.page-container .textLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Estilo para la capa de texto */
+.textLayer {
+    position: absolute;
+    z-index: 2;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+/* Estilo del texto dentro de la capa */
+/* Corregido para apuntar a los <span> que crea el JS */
+.textLayer > span {
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+}
+
+/* Estilo para el texto seleccionado */
+/* Corregido para aplicar el estilo a los spans, no a la capa entera */
+.textLayer span::selection {
+    background-color: rgba(0, 120, 255, 0.4);
+    color: transparent; /* Permite ver el fondo sin ocultar la imagen */
+}
+
+/* En modo oscuro, la selección funciona con un fondo semi-transparente */
+body.dark .textLayer span::selection {
+    background-color: rgba(0, 120, 255, 0.6);
+    color: transparent; /* Mantiene el texto transparente para ver el fondo */
+}
